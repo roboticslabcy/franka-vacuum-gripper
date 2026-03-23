@@ -57,7 +57,7 @@ install(TARGETS vacuum_gripper_node
 install(DIRECTORY include/
   DESTINATION include)
 
-install(DIRECTORY launch config
+install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/)
 
 install(PROGRAMS scripts/vacuum_gripper_demo.py
