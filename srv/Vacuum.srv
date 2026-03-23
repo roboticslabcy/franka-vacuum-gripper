@@ -1,0 +1,13 @@
+# Vacuum setpoint [mbar]
+uint8 vacuum
+
+# Timeout in milliseconds
+int32 timeout_ms
+
+# Production setup profile: "P0", "P1", "P2", "P3"
+string profile
+
+---
+
+bool success
+string message

@@ -1,0 +1,35 @@
+# Build artifacts
+build/
+install/
+log/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!*Config.cmake
+!*ConfigVersion.cmake
+
+# Compiled output
+*.o
+*.so
+*.a
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db

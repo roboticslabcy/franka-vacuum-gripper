@@ -1,0 +1,7 @@
+# Dropoff timeout in milliseconds
+int32 timeout_ms
+
+---
+
+bool success
+string message
