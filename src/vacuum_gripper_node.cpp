@@ -132,6 +132,9 @@ void VacuumGripperNode::publishState() {
                          "Failed to read vacuum gripper state: %s", e.what());
   } catch (const franka::InvalidOperationException& e) {
     // Another readOnce is already running — skip this cycle silently
+  } catch (const std::exception& e) {
+    RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 5000,
+                         "Failed to read vacuum gripper state: %s", e.what());
   }
 }
 
