@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
-#include <thread>
 
 #include <franka/vacuum_gripper.h>
 #include <franka/vacuum_gripper_state.h>
@@ -22,8 +22,9 @@ class VacuumGripperNode : public rclcpp::Node {
   ~VacuumGripperNode() override;
 
  private:
-  // libfranka vacuum gripper instance
+  // libfranka vacuum gripper instance — not thread-safe, protected by gripper_mutex_
   std::unique_ptr<franka::VacuumGripper> gripper_;
+  std::mutex gripper_mutex_;
 
   // Publishers
   rclcpp::Publisher<msg::VacuumGripperState>::SharedPtr state_publisher_;

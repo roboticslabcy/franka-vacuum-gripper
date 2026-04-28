@@ -69,6 +69,7 @@ void VacuumGripperNode::handleVacuum(const std::shared_ptr<srv::Vacuum::Request>
               request->vacuum, request->timeout_ms, request->profile.c_str());
 
   try {
+    std::lock_guard<std::mutex> lock(gripper_mutex_);
     response->success = gripper_->vacuum(request->vacuum, timeout, profile);
     response->message = response->success ? "Vacuum established" : "Vacuum not established within timeout";
   } catch (const franka::CommandException& e) {
@@ -89,6 +90,7 @@ void VacuumGripperNode::handleDropOff(const std::shared_ptr<srv::DropOff::Reques
   RCLCPP_INFO(get_logger(), "DropOff: timeout=%d ms", request->timeout_ms);
 
   try {
+    std::lock_guard<std::mutex> lock(gripper_mutex_);
     response->success = gripper_->dropOff(timeout);
     response->message = response->success ? "Drop-off successful" : "Drop-off failed";
   } catch (const franka::CommandException& e) {
@@ -108,6 +110,7 @@ void VacuumGripperNode::handleStop(
   RCLCPP_INFO(get_logger(), "Stop requested");
 
   try {
+    std::lock_guard<std::mutex> lock(gripper_mutex_);
     response->success = gripper_->stop();
     response->message = response->success ? "Stopped" : "Stop command returned false";
   } catch (const franka::CommandException& e) {
@@ -122,6 +125,11 @@ void VacuumGripperNode::handleStop(
 }
 
 void VacuumGripperNode::publishState() {
+  std::unique_lock<std::mutex> lock(gripper_mutex_, std::try_to_lock);
+  if (!lock.owns_lock()) {
+    return;  // a service call is in progress — skip this cycle
+  }
+
   try {
     const auto state = gripper_->readOnce();
     auto msg = toRosMsg(state);
@@ -130,8 +138,6 @@ void VacuumGripperNode::publishState() {
   } catch (const franka::NetworkException& e) {
     RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 5000,
                          "Failed to read vacuum gripper state: %s", e.what());
-  } catch (const franka::InvalidOperationException& e) {
-    // Another readOnce is already running — skip this cycle silently
   } catch (const std::exception& e) {
     RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 5000,
                          "Failed to read vacuum gripper state: %s", e.what());
